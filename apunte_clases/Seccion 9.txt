@@ -1,0 +1,55 @@
+Seccion 9
+------------------------------------------------------
+//instalar servidor node express
+> npm install express --save
+
+// crear el archivo app.js que tendra la configuracion de express (rutas, listen, getters).
+// codigos de error: https://es.wikipedia.org/wiki/Anexo:C%C3%B3digos_de_estado_HTTP
+// codigos de colores para resaltar consola. (\x1b[32m%s\x1b[0m')
+
+// instalar servicio de mon que se encarga de recargar el servidor node cuando hay cambios de codigo
+//https://github.com/remy/nodemon
+> npm install --save-dev nodemon
+// agrego script al package.json => "start": "nodemon app.js"
+// levantar el server con "npm start"!!!!!
+
+//instalar mongodb
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+cambiar directorio de base de datos "C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe" --dbpath="C:\data\db"
+levantar base: "C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe"
+
+//instalar robo 3T -> es un toad
+https://robomongo.org/download
+// creo la conexion a localhost de mongodb
+//crear base de datos hospitalDB
+
+//instalar  mongoose js -> libreria para conectar a la base desde el proyecto.
+> npm install mongoose
+// conectar con mongoose a hospitalDB en app.js
+
+
+/* guardar en github: */
+
+// crear nuevo repositorio en github (backend-server-udemy)
+// en el proyecto correr:
+> git init
+> git status
+
+//crear archivo .gitignore y agregar carpetas/archivos a excluir del commit. (node_modules/)
+
+g4l4nt3
+g1bhubPass2018
+
+> git add . //agrega todos los archivos al repo localhost
+> git status // verifico que aparecen en verde
+> git commit -m "creacion del proyecto"
+> git remote add origin https://github.com/g4l4nt3/backend-server-udemy.git
+> git push -u origin master
+
+//crear tag para freezar el codigo
+> git tag -a v0.0.1 -m "tag seccion 10"
+> git tag //ver que se creo localhost
+> git push --tags
+
+
+//crear release desde la pagina de github

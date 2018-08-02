@@ -1,0 +1,183 @@
+HospitalAPP - Backend Server - Funciones de Usuarios
+------------------------------------------------------------------
+
+clase 100 - Crear coleccion de usuarios
+// Robo 3t
+- crear Colletions Usuarios.
+- insertar documento.
+- crear json mock.
+------------------------------------------------------------------
+
+clase 101 - crear el modelo de los usuarios - node
+// En archivo models/usuario.js.Creo el modelo con algunas restricciones de negocio
+var usuarioSchema = new Schema({
+    nombre: { type: String, required: [true, 'El nombre es requerido'] },
+    email: { type: String, unique: true, required: [true, 'El email es requerido'] },
+    password: { type: String, required: [true, 'La contraseña es requerida'] },
+    img: { type: String, required: false },
+    role: { type: String, required: true, default: 'USER_ROLE' }
+});
+
+// hago publico el modelo
+module.exports = mongoose.model('Usuario', usuarioSchema);
+------------------------------------------------------------------
+
+clase 102 - Crear rutas de los servicios del usuario
+// crear archivo de rutas 'routes/app.js'
+var express = require('express');
+var app = express();
+
+app.get('/', (request, response, next) => {
+    response.status(200).json({
+        ok: true,
+        mensaje: 'peticion realizada correctamente'
+    });
+});
+
+module.exports = app;
+
+En el main > app.js agregar:
+
+
+//importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+
+// Rutas
+app.use('/usuario', usuarioRoutes);
+app.use('/', appRoutes);
+
+/******************* dudas ********************/
+- no entendi como mongoose hace el mapeo del modelo al documento de la base de datos, no se si es por definir la variable usuarioSchema.
+- node middleware -> app.use: http://expressjs.com/es/guide/using-middleware.html
+- como se hace debbuger en node?
+
+------------------------------------------------------------------
+
+clase 103 - Crear usuario POST
+
+> npm install body-parser
+
+// agregar requerido en el app.js para que sea un middleware de request que interprete los parametros json
+
+// servicio POST de creacion de usuario.
+// en POSTMAN se generaron los request de prueba.
+
+------------------------------------------------------------------
+
+clase 104 - Validaciones para el modelo de usuario
+
+> npm install mongoose-unique-validator --save
+
+var uniqueValidator = require('mongoose-unique-validator');
+usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser único ' });
+
+------------------------------------------------------
+
+clase 105 - encriptar pass
+
+> npm install bcryptjs --save
+
+var bcrypt = require('bcryptjs');
+bcrypt.hashSync(password, 10)
+
+------------------------------------------------------
+
+clase 106 - PUT - Actualizar un usuario
+
+- crea el metodo put app.put('/:id', (request, response)
+- lectura del parametro:  var id = request.params.id;
+- busqueda en la base por Id: Usuario.findById(id, (err, usuario) //retorna el objeto usuario
+- actualiza los parametros y guarda: usuario.save
+
+------------------------------------------------------
+
+clase 107 - DELETE - borrar un usuario
+
+- similar al PUT pero utiliza el metodo del modelo Usuario.findByIdAndRemove
+
+------------------------------------------------------
+
+clase 108 - Login de usuario
+
+- crea ruta login
+- agrega la ruta al app.js
+- crea metodo POST
+- usar metodo Usuario.findOne
+- comparar contraseña encriptada (!bcrypt.compareSync(body.password, usuarioDB.password))
+
+------------------------------------------------------
+
+clase 109 - Generar JWT (json web token)
+
+> npm install jsonwebtoken --save
+
+en login.js
+var jwt = require('jsonwebtoken');
+
+// Crear un token !!
+var payload = { usuario: usuarioDB };
+var seed = "@seed-propio"
+var token = jwt.sign( payload, seed, { expiresIn: 14400 }); //token expira en 14400 segundos = 4 horas
+
+------------------------------------------------------
+
+clase 110 - Revision de Token - Middleware
+
+// Verificar Token Middleware
+app.use('/', (request, response, next) => {
+    var seed = config.SEED;
+    var token = request.query.token;
+
+    jwt.verify(token, seed, (err, decode) => {
+        if (err) {
+            return response.status(401).json({
+                ok: false,
+                mensaje: 'No autorizado',
+                errors: err
+            });
+        }
+
+        next(); //agrego este next para que continue ejecutando luego del Middleware
+    });
+});
+
+
+------------------------------------------------------
+
+clase 111 - Revision de Token - Middleware
+
+- se movio el codigo de la clase anterior a un archivo middlewares/autenticacion
+- exportando una funcion que luego se pasa a cada servicio para que verifique el token.
+
+exports.verficaToken = function(request, response, next) {
+    var seed = config.SEED;
+    var token = request.query.token;
+
+    jwt.verify(token, seed, (err, decoded) => {
+        if (err) {
+            return response.status(401).json({
+                ok: false,
+                mensaje: 'No autorizado',
+                errors: err
+            });
+        }
+
+        request.usuarioLogueado = decoded.usuario;
+        next();
+    });
+}
+
+
+- luego se utiliza en los request:
+app.put('/:id', mdAutenticacion.verficaToken, (request, response) 
+
+
+
+
+
+
+
+
+
+
