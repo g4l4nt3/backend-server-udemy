@@ -2,6 +2,9 @@ var express = require('express');
 var app = express();
 var Usuario = require('../models/usuario');
 var bcrypt = require('bcryptjs');
+// var config = require('../config/config');
+// var jwt = require('jsonwebtoken');
+var mdAutenticacion = require('../middlewares/autenticacion');
 
 //==================================================
 // Obtener todos los usuarios
@@ -27,9 +30,29 @@ app.get('/', (request, response, next) => {
 });
 
 //==================================================
+// Verificar Token Middleware / se hizo una version optimizada en el archivo middlewares/autenticacion
+//==================================================
+// app.use('/', (request, response, next) => {
+//     var seed = config.SEED;
+//     var token = request.query.token;
+
+//     jwt.verify(token, seed, (err, decode) => {
+//         if (err) {
+//             return response.status(401).json({
+//                 ok: false,
+//                 mensaje: 'No autorizado',
+//                 errors: err
+//             });
+//         }
+
+//         next();
+//     });
+// });
+
+//==================================================
 // Actualizar usuario
 //==================================================
-app.put('/:id', (request, response) => {
+app.put('/:id', mdAutenticacion.verficaToken, (request, response) => {
     var id = request.params.id;
     var body = request.body;
 
@@ -66,7 +89,8 @@ app.put('/:id', (request, response) => {
 
             response.status(200).json({
                 ok: true,
-                usuario: usuarioGuardado
+                usuario: usuarioGuardado,
+                usuarioToken: request.usuarioLogueado
             });
         });
     });
@@ -75,7 +99,7 @@ app.put('/:id', (request, response) => {
 //==================================================
 // Crear un nuevo usuario
 //==================================================
-app.post('/', (request, response) => {
+app.post('/', mdAutenticacion.verficaToken, (request, response) => {
     var body = request.body;
 
     let encriptarPass = (password) =>
@@ -101,15 +125,16 @@ app.post('/', (request, response) => {
 
         response.status(201).json({
             ok: true,
-            usuario: usuarioGuardado
+            usuario: usuarioGuardado,
+            usuarioToken: request.usuarioLogueado
         });
     });
 
 });
 //==================================================
-// Actualizar usuario
+// Borrar usuario
 //==================================================
-app.delete('/:id', (request, response) => {
+app.delete('/:id', mdAutenticacion.verficaToken, (request, response) => {
     var id = request.params.id;
 
     Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
@@ -124,7 +149,8 @@ app.delete('/:id', (request, response) => {
 
         response.status(201).json({
             ok: true,
-            usuario: usuarioBorrado
+            usuario: usuarioBorrado,
+            usuarioToken: request.usuarioLogueado
         });
 
     });
