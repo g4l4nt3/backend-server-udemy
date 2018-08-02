@@ -37,9 +37,6 @@ https://robomongo.org/download
 
 //crear archivo .gitignore y agregar carpetas/archivos a excluir del commit. (node_modules/)
 
-g4l4nt3
-g1bhubPass2018
-
 > git add . //agrega todos los archivos al repo localhost
 > git status // verifico que aparecen en verde
 > git commit -m "creacion del proyecto"
