@@ -1,10 +1,15 @@
 // Requires
 var express = require('express');
 var mongoose = require('mongoose');
-
+var bodyParser = require('body-parser');
 
 // Inicializar variables
 var app = express();
+
+
+//Body Parser: permite hacer un parseo de los parametros de request application/json y application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
 //importar rutas
@@ -21,13 +26,9 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB',
     });
 
 
-
 // Rutas
 app.use('/usuario', usuarioRoutes);
 app.use('/', appRoutes);
-
-
-
 
 // Escuchar peticiones
 app.listen(3000, () => {
