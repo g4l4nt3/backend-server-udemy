@@ -20,3 +20,33 @@ Generar imagen por defecto
 
 Tarea	de	la	sección	11	– Hospitales	y	Médicos
 Crear	rutas,	modelos	y	CRUD	de	hospitales
+
+------------------------------------------------------
+Clase 120 - Get Populate.
+    // Uttilizando las funciones populate de mongoose
+
+    Medico.find({})
+        .populate('usuario', 'nombre email') //buscar la relacion de tablas y filtra solo los campos nombre y email
+        .populate('hospital', 'nombre ')
+
+
+------------------------------------------------------
+Clase 121 -  Paginar los resultados de las búsquedas
+
+    var desde = request.query.desde || 0;
+    desde = Number(desde);
+
+    Usuario.find({}, 'nombre email img role')
+        .skip(desde) //le indica a mongoose que salte los primeros 'desde' registros
+        .limit(5) //y que traiga de a 5 registros
+
+
+    Usuario.count({}, (err, contador) => // devuelve la cantidad de registros usuarios en la base
+
+------------------------------------------------------
+Clase 122 -   Búsqueda general en todas las colecciones de forma simultánea
+
+
+
+
+

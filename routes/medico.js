@@ -8,19 +8,30 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 //==================================================
 app.get('/', (request, response) => {
 
-    Medico.find({}, (err, medicos) => {
-        if (err)
-            return response.status(500).json({
-                ok: true,
-                mensaje: "Error al obtener medicos",
-                errors: err
-            });
+    var desde = request.query.desde || 0;
+    desde = Number(desde);
 
-        return response.status(200).json({
-            ok: true,
-            medicos: medicos
+    Medico.find({})
+        .populate('usuario', 'nombre email') //buscar la relacion de tablas y filtra solo los campos nombre y email
+        .populate('hospital', 'nombre ')
+        .skip(desde)
+        .limit(5)
+        .exec((err, medicos) => {
+            if (err)
+                return response.status(500).json({
+                    ok: true,
+                    mensaje: "Error al obtener medicos",
+                    errors: err
+                });
+
+            Medico.count({}, (err, contador) => {
+                return response.status(200).json({
+                    ok: true,
+                    medicos: medicos,
+                    totalMedicos: contador
+                });
+            });
         });
-    });
 });
 
 //==================================================

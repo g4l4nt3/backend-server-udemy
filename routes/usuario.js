@@ -11,43 +11,35 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 //==================================================
 app.get('/', (request, response, next) => {
 
-    Usuario.find({}, 'nombre email img role').exec(
-        (err, usuarios) => {
+    var desde = request.query.desde || 0;
+    desde = Number(desde);
 
-            if (err) {
-                return response.status(500).json({
-                    ok: false,
-                    mensaje: 'Error al obtener usuarios',
-                    errors: err
+    Usuario.find({}, 'nombre email img role')
+        .skip(desde)
+        .limit(5)
+        .exec(
+            (err, usuarios) => {
+
+                if (err) {
+                    return response.status(500).json({
+                        ok: false,
+                        mensaje: 'Error al obtener usuarios',
+                        errors: err
+                    });
+                }
+
+                Usuario.count({}, (err, contador) => {
+
+                    response.status(200).json({
+                        ok: true,
+                        usuarios: usuarios,
+                        totalUsuarios: contador
+                    });
+
                 });
-            }
 
-            response.status(200).json({
-                ok: true,
-                usuarios: usuarios
             });
-        });
 });
-
-//==================================================
-// Verificar Token Middleware / se hizo una version optimizada en el archivo middlewares/autenticacion
-//==================================================
-// app.use('/', (request, response, next) => {
-//     var seed = config.SEED;
-//     var token = request.query.token;
-
-//     jwt.verify(token, seed, (err, decode) => {
-//         if (err) {
-//             return response.status(401).json({
-//                 ok: false,
-//                 mensaje: 'No autorizado',
-//                 errors: err
-//             });
-//         }
-
-//         next();
-//     });
-// });
 
 //==================================================
 // Actualizar usuario
