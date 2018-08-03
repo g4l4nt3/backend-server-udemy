@@ -45,6 +45,7 @@ Clase 121 -  Paginar los resultados de las búsquedas
 
 ------------------------------------------------------
 Clase 122 -   Búsqueda general en todas las colecciones de forma simultánea
+-- crear ruta busqueda
 
 Uso de promesas para sincronizar request -> Promise.all
 
@@ -86,3 +87,15 @@ app.get('/coleccion/:tabla/:busqueda'
     });
 
 
+
+------------------------------------------------------
+Clase 126 -   Subir archivos al servidor
+
+-- crear ruta upload
+
+>npm install --save express-fileupload
+
+const fileUpload = require('express-fileupload');
+
+// default options
+app.use(fileUpload());
