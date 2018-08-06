@@ -5,6 +5,51 @@ var Usuario = require('../models/usuario');
 var config = require('../config/config');
 var jwt = require('jsonwebtoken');
 
+// Google
+const CLIENT_ID = require('../config/config').CLIENT_ID;
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(CLIENT_ID);
+
+//==================================================
+// Autenticacion Google
+//==================================================
+async function verify(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    //const userid = payload['sub'];
+    return {
+        nombre: payload.name,
+        email: payload.email,
+        img: payload.picture,
+        google: true
+    }
+}
+
+app.post('/google', async, (request, response) => {
+    var token = request.body.token;
+    var googleUser = await verify(token)
+        .catch(err => {
+            return response.status(403).json({
+                ok: false,
+                mensaje: 'Token no válido',
+                errors: err
+            });
+        });
+
+    response.status(200).json({
+        ok: true,
+        googleUser: googleUser
+    });
+});
+
+
+
+//==================================================
+// Autenticacion normal
+//==================================================
 app.post('/', (request, response) => {
     var body = request.body;
 

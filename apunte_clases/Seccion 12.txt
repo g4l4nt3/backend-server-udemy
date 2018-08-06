@@ -1,0 +1,96 @@
+Backend - Autenticación con Google Sign-in
+
+------------------------------------------------------
+
+Esta sección esta especializada en implementar el Google Sign-in en nuestro backend server:
+
+Crear una aplicación en Google Developer Console
+Generar el ID de nuestra aplicación y un ID Secreto de servidor
+Crear un login básico de pruebas usando el API de Google
+Generar un Token desde el front-end
+Validar el Token en nuestro back-end
+Tip para generar la documentación de nuestros servicios automáticamente
+
+------------------------------------------------------
+
+-- Google API Console
+
+se ingresa a la consola de google:
+
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+https://console.developers.google.com/apis/credentials?project=chrome-cipher-212517
+
+- cear proyecto y credenciales
+- habilito acceso para localhost puertos 3000 y 4000
+
+AdminPro-Login
+
+Cliente OAuth
+
+> Puertos permitidos 
+http://localhost:4000 / 3000
+
+------------------------------------------------------
+
+En un nuevo proyecto, instalamos un server para levantar una pagina de prueba para el token de google:
+> npm install lite-server
+
+** agregar el script  -> "dev": "lite-server -c ls-config.json",
+
+** agregar el archivo ls-config.json con el json:
+    {
+    "port": 4000
+    }
+
+** crear archivo index.html:
+------------------------------------------------------
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Google SingIn Demo</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+        <script src="main.js"></script>
+
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <meta name="google-signin-client_id" content="----i92eecd6forg7duh4dhm99v4de6vg5hn.apps.googleusercontent.com">
+    </head>
+    <body>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        <a href="#" onclick="signOut();">Sign out</a>
+
+        <script>
+            function onSignIn(googleUser) {
+
+                var profile = googleUser.getBasicProfile();
+                console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+                console.log('Name: ' + profile.getName());
+                console.log('Image URL: ' + profile.getImageUrl());
+                console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+                var id_token = googleUser.getAuthResponse().id_token;
+                console.log('id_token: ' + id_token);
+            }
+
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                console.log('User signed out.');
+                });
+            }
+        </script>
+    </body>
+</html>
+
+------------------------------------------------------
+Clase 140
+Integrar login google en backend:
+https://developers.google.com/identity/sign-in/web/backend-auth
+------------------------------------------------------
+
+- crear ruta /login/google por post
+
+>npm install google-auth-library --save
