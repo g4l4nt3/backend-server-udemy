@@ -28,8 +28,10 @@ async function verify(token) {
     }
 }
 
-app.post('/google', async, (request, response) => {
+app.post('/google', async(request, response) => {
     var token = request.body.token;
+
+    //verifico si el token de google es valido
     var googleUser = await verify(token)
         .catch(err => {
             return response.status(403).json({
@@ -39,12 +41,67 @@ app.post('/google', async, (request, response) => {
             });
         });
 
-    response.status(200).json({
-        ok: true,
-        googleUser: googleUser
+    Usuario.findOne({ email: googleUser.email }, (err, usuarioDB) => {
+        if (err) {
+            return response.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar usuario',
+                errors: err
+            });
+        }
+
+        if (usuarioDB) {
+            if (usuarioDB.google == false) {
+                return response.status(400).json({
+                    ok: false,
+                    mensaje: 'Credenciales incorrectas'
+                });
+            }
+
+            // Crear un token !!
+            usuarioDB.password = 'fake';
+            var payload = { usuario: usuarioDB };
+            var token = jwt.sign(payload, config.SEED, { expiresIn: 14400 }); //token expira en 14400 segundos = 4 horas
+
+            return response.status(200).json({
+                ok: true,
+                usuario: usuarioDB,
+                token: token,
+                id: usuarioDB.id
+            });
+
+        } else {
+            // el usuario no existe                
+            var usuario = new Usuario();
+            usuario.nombre = googleUser.nombre;
+            usuario.email = googleUser.email;
+            usuario.img = googleUser.img;
+            usuario.google = true;
+            usuario.password = 'fake';
+
+            usuario.save((err, usuarioGuardado) => {
+                if (err) {
+                    return response.status(500).json({
+                        ok: false,
+                        mensaje: 'Error al crear usuario',
+                        errors: err
+                    });
+                }
+
+                // Crear un token !!
+                var payload = { usuario: usuarioGuardado };
+                var token = jwt.sign(payload, config.SEED, { expiresIn: 14400 }); //token expira en 14400 segundos = 4 horas
+
+                return response.status(200).json({
+                    ok: true,
+                    usuario: usuarioGuardado,
+                    token: token,
+                    id: usuarioGuardado.id
+                });
+            });
+        }
     });
 });
-
 
 
 //==================================================
@@ -82,10 +139,9 @@ app.post('/', (request, response) => {
         // Crear un token !!
         usuarioDB.password = 'fake';
         var payload = { usuario: usuarioDB };
-        var seed = config.SEED;
-        var token = jwt.sign(payload, seed, { expiresIn: 14400 }); //token expira en 14400 segundos = 4 horas
+        var token = jwt.sign(payload, config.SEED, { expiresIn: 14400 }); //token expira en 14400 segundos = 4 horas
 
-        response.status(200).json({
+        return response.status(200).json({
             ok: true,
             usuario: usuarioDB,
             token: token,

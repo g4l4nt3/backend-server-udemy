@@ -91,6 +91,44 @@ Integrar login google en backend:
 https://developers.google.com/identity/sign-in/web/backend-auth
 ------------------------------------------------------
 
+- https://github.com/johnpapa/lite-server
+>npm install google-auth-library --save
 - crear ruta /login/google por post
 
->npm install google-auth-library --save
+// Google
+const CLIENT_ID = require('../config/config').CLIENT_ID;
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(CLIENT_ID);
+
+async function verify(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    //const userid = payload['sub'];
+    return {
+        nombre: payload.name,
+        email: payload.email,
+        img: payload.picture,
+        google: true
+    }
+}
+
+app.post('/google', async(request, response) => {
+    var token = request.body.token;
+    var googleUser = await verify(token)
+
+------------------------------------------------------
+
+Clase 141
+
+Implemento el token para crear usuarios.
+La idea es que use el token de google solo para autenticar.
+Se crea el usuario con los datos de google y se genera un token de jwt para manejar peticiones como en la autenticacion estandar.
+
+------------------------------------------------------
+
+Clase 141
+Documentacion automatica.
+En postman
