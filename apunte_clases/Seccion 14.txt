@@ -1,0 +1,4 @@
+Clase 154
+
+habilitar el cors: https://github.com/expressjs/cors
+> npm install cors --save

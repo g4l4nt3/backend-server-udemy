@@ -89,9 +89,9 @@ app.put('/:id', mdAutenticacion.verficaToken, (request, response) => {
 });
 
 //==================================================
-// Crear un nuevo usuario
+// Crear un nuevo usuario // mdAutenticacion.verficaToken
 //==================================================
-app.post('/', mdAutenticacion.verficaToken, (request, response) => {
+app.post('/', (request, response) => {
     var body = request.body;
 
     let encriptarPass = (password) =>
