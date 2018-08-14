@@ -19,6 +19,7 @@ se ingresa a la consola de google:
 
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+- Google API Console
 https://console.developers.google.com/apis/credentials?project=chrome-cipher-212517
 
 - cear proyecto y credenciales
